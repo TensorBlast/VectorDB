@@ -66,18 +66,24 @@ export async function upsertItems(index: LocalIndex, items: string[] | IndexItem
     }
 }
 
-export async function convertResultsToItems(results: any[]): Promise<IndexItem[]> {
-    const items: IndexItem[] = [];
+export async function convertResults(results: any[]): Promise<Result[]> {
+    const res: Result[] = [];
     for (const result of results) {
 
-        const item : IndexItem = await createItem(result.item.metadata.text as string, result.item.vector);
+        const item : Result = {
+            id: result.item.id,
+            vector: result.item.vector,
+            metadata: result.item.metadata,
+            norm: result.item.norm,
+            score: result.score
+        };
 
-        items.push(item);
+        res.push(item);
     }
-    return items;
+    return res;
 }
 
-export async function query(index: LocalIndex, item: string | IndexItem, n=1): Promise<IndexItem[] | null> {
+export async function query(index: LocalIndex, item: string | IndexItem, n=1): Promise<Result[] | null> {
     if (typeof item === "string") {
         const vector = await getEmbeddings(item);
         const results = await index.queryItems(vector, n);
@@ -85,7 +91,7 @@ export async function query(index: LocalIndex, item: string | IndexItem, n=1): P
             for (const result of results) {
                 console.log(`[${result.score}] ${result.item.metadata.text}`);
             }
-            const resultsitems = await convertResultsToItems(results);
+            const resultsitems = await convertResults(results);
             return resultsitems;
         } else {
             console.log(`No results found`);
@@ -100,7 +106,7 @@ export async function query(index: LocalIndex, item: string | IndexItem, n=1): P
             for (const result of results) {
                 console.log(`[${result.score}] ${result.item.metadata.text}`);
             }
-            const resultsitems = await convertResultsToItems(results);
+            const resultsitems = await convertResults(results);
             return resultsitems;
         } else {
             console.log(`No results found`);

@@ -43,6 +43,8 @@ await ItemService.addItems(index, phrases);
 let it = await ItemService.createItem(searchstr);
 const result = await ItemService.query(index, it, 3);
 
+console.log(result);
+
 if (!process.env.PORT) {
     process.exit(1);
 }
