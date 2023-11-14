@@ -35,17 +35,17 @@ export async function addItem(index: LocalIndex, item: string | IndexItem) {
 
                 await index.insertItem(update);
         } else {
-            if (typeof item.vector === "undefined") {
-                item.vector = await getEmbeddings(item.metadata.text as string);
-            }
+            // if (typeof item.vector === "undefined") {
+            //     item.vector = await getEmbeddings(item.metadata.text as string);
+            // }
             console.log('Adding object item: ' + item.id + " -> " + item.metadata.text);
-            const update : IndexItem = {
-                id: item.id,
-                vector: item.vector,
-                metadata: item.metadata,
-                norm: ItemSelector.normalize(item.vector)
-            }
-            await index.insertItem(update);
+            // const update : IndexItem = {
+            //     id: item.id,
+            //     vector: item.vector,
+            //     metadata: item.metadata,
+            //     norm: ItemSelector.normalize(item.vector)
+            // }
+            await index.insertItem(item);
         }
     }catch (error) {
         console.log(error);
@@ -68,40 +68,29 @@ export async function upsertItem(index: LocalIndex, item: string | IndexItem) {
         console.log("Upserting string item: " + toadd.id + " -> "+ toadd.metadata.text)
     } else if (typeof item === 'object') {
         console.log("Upserting object item: " + item.id + " -> "+ item.metadata.text)
-        if (item.vector === undefined) {
-            item.vector = await getEmbeddings(item.metadata.text as string);
-        }
-        if (item.id === undefined) {
-            item.id = await createHash("sha256").update(item.metadata.text as string).digest("hex");
-        }
-        const target: IndexItem = {
-            id: item.id,
-            vector: item.vector,
-            metadata: item.metadata,
-            norm: ItemSelector.normalize(item.vector)
-        };
-        await index.upsertItem(target);
+        // if (item.vector === undefined) {
+        //     item.vector = await getEmbeddings(item.metadata.text as string);
+        // }
+        // if (item.id === undefined) {
+        //     item.id = await createHash("sha256").update(item.metadata.text as string).digest("hex");
+        // }
+        // const target: IndexItem = {
+        //     id: item.id,
+        //     vector: item.vector,
+        //     metadata: item.metadata,
+        //     norm: ItemSelector.normalize(item.vector)
+        // };
+        await index.upsertItem(item);
     }
 }
 
 
 export async function upsertItems(index: LocalIndex, items: string[] | IndexItem[]) {
     await Promise.all(items.map( async (element: string|IndexItem) => {
-        if (typeof element === "string") {
-            const result = await index.listItemsByMetadata({text: element});
-            if (result.length > 0) {
-                for (const res of result) {
-                    await index.deleteItem(res.id);
-                }
-            } 
-            const item = await createItem(element);
-            console.log(`Upserting item of type string: ${item.id} -> ${item.metadata.text}`)
-            await upsertItem(index, item);
-        }
-        else {
-            if (typeof element === 'object') {
-                await upsertItem(index, element);
-            }
+        try {
+            await upsertItem(index, element);
+        } catch (error) {
+            console.log(error);
         }
     }));
 }
