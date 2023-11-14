@@ -1,0 +1,1 @@
+node_modules/@xenova/transformers/.cache/Xenova/bge-large-en-v1.5/onnx/model_quantized.onnx filter=lfs diff=lfs merge=lfs -text
