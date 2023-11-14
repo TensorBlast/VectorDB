@@ -42,7 +42,7 @@ itemRouter.post("/", async (req: Request, res: Response) => {
                 const item = await ItemService.createItem(txt);
                 items.push(item);
             }
-            await ItemService.addItems(index, items);
+            await ItemService.upsertItems(index, items);
             console.log(items);
             res.status(200).send(`Inserted all ${items.length} records!`)
         }
