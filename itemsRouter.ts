@@ -1,9 +1,8 @@
 import * as ItemService from './itemService'
 
-import { LocalIndex } from "vectra";
+import { LocalIndex, IndexItem } from "vectra";
 import path from "path";
 import express, { Request, Response } from "express";
-import { BaseItem, Item } from "./item";
 import * as lodash from "lodash";
 
 export const itemRouter = express.Router();
@@ -15,7 +14,7 @@ const index = new LocalIndex(path.join(__dirname,"..", "index"));
 
 itemRouter.get("/", async (req: Request, res: Response) => {
     try {
-        const items = await ItemService.getAllItems(index);
+        const items: IndexItem[] = await ItemService.getAllItems(index);
         res.status(200).send(items);
     }
     catch (e) {
@@ -34,7 +33,7 @@ itemRouter.post("/", async (req: Request, res: Response) => {
             });
             res.status(200).send('Inserted all records with existing vectors!')
         } else if (body.text instanceof Array) {
-            const items: Item[] = [];
+            const items: IndexItem[] = [];
             await Promise.all(body.text.map(async (element: string) => {
                 const item = await ItemService.createItem(element);
                 items.push(item);
@@ -45,7 +44,7 @@ itemRouter.post("/", async (req: Request, res: Response) => {
         }
         else {
             console.log(`POST request containing single item. Inserting - ${body.text}`)
-            const item = await ItemService.createItem(body.text);
+            const item : IndexItem = await ItemService.createItem(body.text);
             await ItemService.upsertItem(index, item);
             res.status(200).send(item);
         }

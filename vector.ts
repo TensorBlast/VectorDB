@@ -1,5 +1,5 @@
 import { pipeline } from "@xenova/transformers";
-import { LocalIndex } from "vectra";
+import { IndexItem, LocalIndex } from "vectra";
 import path from "path";
 
 import * as dotenv from "dotenv";
@@ -8,13 +8,13 @@ import { Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 
-import { Item } from "./item";
 
 import { createHash } from "crypto";
 
 import * as ItemService from './itemService'
 import { itemRouter } from "./itemsRouter";
 
+type Item = IndexItem;
 dotenv.config();
 
 const __dirname = path.resolve();
