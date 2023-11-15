@@ -44,7 +44,7 @@ itemRouter.post("/", async (req: Request, res: Response) => {
 
             lodash.zip(body.text, body.vector).map(async (element: any) => {
                 const item = await ItemService.createItem(element[0], element[1]);
-                await ItemService.addItem(index,item);
+                await ItemService.upsertItem(index,item);
             });
             res.status(200).send('Inserted all records with existing vectors!')
         } else if (body.text instanceof Array) {
