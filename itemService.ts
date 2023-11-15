@@ -98,7 +98,7 @@ export async function query(index: LocalIndex, item: string | IndexItem, n=1): P
             return null;
         }
     } else {
-        if (typeof item.vector === "undefined") {
+        if (item.vector === null) {
             item.vector = await getEmbeddings(item.metadata.text as string);
         }
         const results = await index.queryItems(item.vector, n);
@@ -117,10 +117,5 @@ export async function query(index: LocalIndex, item: string | IndexItem, n=1): P
 
 export async function getAllItems(index: LocalIndex): Promise<IndexItem[]> {
     const results = await index.listItems();
-    let items: IndexItem[] = [];
-    for (const result of results) {
-        let item = await createItem(result.metadata.text as string, result.vector);
-        items.push(item);
-    }
-    return items;
+    return results;
 }

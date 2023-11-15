@@ -22,6 +22,21 @@ itemRouter.get("/", async (req: Request, res: Response) => {
     }
 });
 
+itemRouter.get("/:id", async (req: Request, res: Response) => {
+    try {
+        const items: IndexItem | undefined = await index.getItem(req.params.id);
+        if (items === undefined) { 
+            res.status(404).send(`Item with id ${req.params.id} not found!`);
+        }
+        else {
+            res.status(200).send(items);
+        }
+    }
+    catch (e) {
+        res.status(500).send(e.message);
+    }
+});
+
 itemRouter.post("/", async (req: Request, res: Response) => {
     try {
         let body = req.body;
