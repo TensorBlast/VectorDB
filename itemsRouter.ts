@@ -58,9 +58,16 @@ itemRouter.post("/", async (req: Request, res: Response) => {
             res.status(200).send(`Inserted all ${items.length} records!`)
         }
         else {
-            console.log(`POST request containing single item. Inserting - ${body.text}`)
-            const item : IndexItem = await ItemService.createItem(body.text);
+            let item;
+            if ('vector' in body) {
+                item = await ItemService.createItem(body.text, body.vector);
+            }
+            else {
+                item = await ItemService.createItem(body.text);
+            }
+            console.log(`POST request containing single item. Inserting - ${body.text}`);
             await ItemService.upsertItem(index, item);
+            console.log(item);
             res.status(200).send(item);
         }
     }
