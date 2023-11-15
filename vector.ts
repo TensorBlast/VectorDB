@@ -14,7 +14,7 @@ import { itemRouter, queryRouter } from "./itemsRouter";
 type Item = IndexItem;
 dotenv.config();
 
-const __dirname = path.resolve();
+let __dirname = path.resolve(process.env.INDEX_LOCATION || "");
 
 let phrases: string[] = ['That is a very happy person', 
                       'That is a Happy Dog',
@@ -26,9 +26,16 @@ const modelname = "Xenova/bge-large-en-v1.5";
 
 const pipe = await pipeline("feature-extraction", modelname);
 
+let index: LocalIndex;
 
 
-const index = new LocalIndex(path.join(__dirname,"..", "index"));
+if (!process.env.INDEX_LOCATION) {
+    console.log("INDEX_LOCATION not set! Using default -> " + __dirname);
+    index = new LocalIndex(path.join(__dirname,"..", "index"));
+}
+else {
+    index = new LocalIndex(path.join(__dirname, "index"));
+}
 console.log(`Index location: ${path.join(__dirname,"..", "index")}`);
 
 if (!await index.isIndexCreated()) {
