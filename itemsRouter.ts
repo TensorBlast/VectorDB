@@ -49,10 +49,6 @@ itemRouter.post("/", async (req: Request, res: Response) => {
             res.status(200).send('Inserted all records with existing vectors!')
         } else if (body.text instanceof Array) {
             const items: IndexItem[] = [];
-            // await Promise.all(body.text.map(async (element: string) => {
-            //     const item = await ItemService.createItem(element);
-            //     items.push(item);
-            // }));
             for (const txt of body.text) {
                 const item = await ItemService.createItem(txt);
                 items.push(item);
