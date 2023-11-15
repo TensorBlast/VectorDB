@@ -7,7 +7,7 @@ const modelname = "Xenova/bge-large-en-v1.5";
 
 const pipe = await pipeline("feature-extraction", modelname);
 
-type Result = IndexItem & { score: number };
+export type Result = IndexItem & { score: number };
 
 export async function getEmbeddings(phrase: string) {
     const response =  await pipe(phrase, {"pooling": "mean", "normalize": false});
@@ -112,6 +112,20 @@ export async function query(index: LocalIndex, item: string | IndexItem, n=1): P
             console.log(`No results found`);
             return null;
         }
+    }
+}
+
+export async function queryVector(index: LocalIndex, vector: number[], n=1): Promise<Result[] | null> {
+    const results = await index.queryItems(vector, n);
+    if (results.length > 0) {
+        for (const result of results) {
+            console.log(`[${result.score}] ${result.item.metadata.text}`);
+        }
+        const resultsitems = await convertResults(results);
+        return resultsitems;
+    } else {
+        console.log(`No results found`);
+        return null;
     }
 }
 

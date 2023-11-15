@@ -7,6 +7,8 @@ import * as lodash from "lodash";
 
 export const itemRouter = express.Router();
 
+export const queryRouter = express.Router();
+
 const __dirname = path.resolve();
 
 
@@ -74,5 +76,42 @@ itemRouter.post("/", async (req: Request, res: Response) => {
     catch (e) {
         console.log(`Error: ${e.message}`)
         res.status(500).send(e.message);
+    }
+});
+
+queryRouter.get("/", async (req: Request, res: Response) => {
+
+    try {
+        const text : string = req.body.text;
+        const vector : number[] = req.body.vector;
+        const k : number = req.body.k;
+        console.log(text);
+        if (text === undefined && vector === undefined) {
+            res.status(400).send("Please provide either text or vector!");
+        }
+        else if (vector === undefined) {
+            const results : ItemService.Result[] | null = await ItemService.query(index, text, k);
+            if (results !== null && results?.length > 0) {
+                res.status(200).send(results);
+            }
+            else {
+                res.status(404).send(`No results found for ${text}`);
+            }
+        }
+        else if (text === undefined) {
+            const results : ItemService.Result[] | null = await ItemService.queryVector(index, vector, k);
+            if (results !== null && results?.length > 0) {
+                res.status(200).send(results);
+            }
+            else {
+                res.status(404).send(`No results found for ${vector}`);
+            }
+        }
+        else {
+            res.status(400).send("Please provide either text or vector, not both!");
+        }
+    } catch (error: any) {
+        console.log(`Error: ${error.message}`)
+        res.status(500).send(error.message);
     }
 });

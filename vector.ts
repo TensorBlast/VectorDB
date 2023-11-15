@@ -8,11 +8,8 @@ import { Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 
-
-import { createHash } from "crypto";
-
 import * as ItemService from './itemService'
-import { itemRouter } from "./itemsRouter";
+import { itemRouter, queryRouter } from "./itemsRouter";
 
 type Item = IndexItem;
 dotenv.config();
@@ -60,6 +57,7 @@ app.get("/", async (req: Request, res: Response) => {
     res.status(200).send("VectorDB is running!")});
 
 app.use("/items", itemRouter);
+app.use("/query", queryRouter);
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
