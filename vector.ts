@@ -32,11 +32,12 @@ let index: LocalIndex;
 if (!process.env.INDEX_LOCATION) {
     console.log("INDEX_LOCATION not set! Using default -> " + __dirname);
     index = new LocalIndex(path.join(__dirname,"..", "index"));
+    console.log(`Index location: ${path.join(__dirname,"..", "index")}`);
 }
 else {
     index = new LocalIndex(path.join(__dirname, "index"));
+    console.log(`Index location: ${path.join(__dirname, "index")}`);
 }
-console.log(`Index location: ${path.join(__dirname,"..", "index")}`);
 
 if (!await index.isIndexCreated()) {
     await index.createIndex();
