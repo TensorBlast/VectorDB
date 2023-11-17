@@ -1,4 +1,4 @@
-import { pipeline } from "@xenova/transformers";
+import { pipeline, env } from "@xenova/transformers";
 import { IndexItem, LocalIndex } from "vectra";
 import path from "path";
 
@@ -8,11 +8,50 @@ import { Request, Response } from "express";
 import cors from "cors";
 import helmet from "helmet";
 
-import * as ItemService from './itemService'
 import { itemRouter, queryRouter } from "./itemsRouter";
 
+var args = process.argv.slice(2);
+
+if (args.length >= 1) {
+    if (args[0] === "--help") {
+        console.log("Usage: node vector.ts [--dotenv] [location]");
+        process.exit(0);
+    }
+    else {
+        if (args[0] == "--dotenv") {
+            try {
+                const dotenvlocation = args[1];
+                console.log(`VectorDB using dotenv from argument - ${dotenvlocation}`);
+                process.env.DOTENV = dotenvlocation;
+                dotenv.config({path: dotenvlocation});
+            }
+            catch (e) {
+                console.log("--dotenv should be followed by path!");
+                console.log(e.message());
+                process.exit(1);
+            }
+        }
+        else {
+            console.log(`Unknown argument to VectorDB: ${args[0]}`);
+            console.log("VectorDB using default dotenv");
+            dotenv.config();
+        }
+    }
+}
+else if (process.env.DOTENV !== null) {
+    console.log("VectorDB using dotenv from Environment Variable DOTENV: " + process.env.DOTENV);
+    dotenv.config({path: process.env.DOTENV});
+}
+else {
+    console.log("VectorDB usinf default dotenv");
+    dotenv.config();
+}
+
+import * as ItemService from './itemService';
+
 type Item = IndexItem;
-dotenv.config();
+
+env.localModelPath = process.env.MODELPATH || "";
 
 let __dirname = path.resolve(process.env.INDEX_LOCATION || "");
 
@@ -22,9 +61,12 @@ let phrases: string[] = ['That is a very happy person',
 
 const searchstr: string = "That is a happy person!"
 
-const modelname = process.env.MODEL || "Xenova/bge-large-en-v1.5";
+let modelname = process.env.MODELNAME ?? "Xenova/bge-large-en-v1.5";
 
-console.log(`Using model: ${modelname}`);
+if (env.localModelPath !== "") {
+    console.log("APP: Local model path: " + env.localModelPath);
+    env.allowRemoteModels = false;
+}
 
 const pipe = await pipeline("feature-extraction", modelname);
 
@@ -32,13 +74,13 @@ let index: LocalIndex;
 
 
 if (!process.env.INDEX_LOCATION) {
-    console.log("INDEX_LOCATION not set! Using default -> " + __dirname);
+    console.log("APP: INDEX_LOCATION not set! Using default -> " + __dirname);
     index = new LocalIndex(path.join(__dirname,"..", "index"));
     console.log(`Index location: ${path.join(__dirname,"..", "index")}`);
 }
 else {
     index = new LocalIndex(path.join(__dirname, "index"));
-    console.log(`Index location: ${path.join(__dirname, "index")}`);
+    console.log(`APP: Index location: ${path.join(__dirname, "index")}`);
 }
 
 if (!await index.isIndexCreated()) {

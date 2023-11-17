@@ -1,10 +1,25 @@
-import { pipeline } from "@xenova/transformers";
+import { pipeline, env } from "@xenova/transformers";
 import { LocalIndex, ItemSelector } from "vectra";
 import { IndexItem } from "vectra";
 import { createHash } from "crypto";
+import * as dotenv from "dotenv";
 
-const modelname = "Xenova/bge-large-en-v1.5";
+if (process.env.DOTENV !== null) {
+    console.log('ItemService using dotenv: ' + process.env.DOTENV);
+    dotenv.config({path: process.env.DOTENV});
+}
+else {
+    console.log(`ItemService using default dotenv`);
+    dotenv.config();
+}
 
+let modelname = process.env.MODELNAME ?? "Xenova/bge-large-en-v1.5";
+env.localModelPath = process.env.MODELPATH || "";
+
+if (env.localModelPath !== "") {
+    console.log("Service Methods using: Local model path: " + env.localModelPath);
+    env.allowRemoteModels = false;
+}
 const pipe = await pipeline("feature-extraction", modelname);
 
 export type Result = IndexItem & { score: number };
