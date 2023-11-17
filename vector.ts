@@ -22,7 +22,9 @@ let phrases: string[] = ['That is a very happy person',
 
 const searchstr: string = "That is a happy person!"
 
-const modelname = "Xenova/bge-large-en-v1.5";
+const modelname = process.env.MODEL || "Xenova/bge-large-en-v1.5";
+
+console.log(`Using model: ${modelname}`);
 
 const pipe = await pipeline("feature-extraction", modelname);
 

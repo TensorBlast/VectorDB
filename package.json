@@ -13,7 +13,6 @@
   "type": "module",
   "dependencies": {
     "@types/lodash": "^4.14.201",
-    "@visheratin/web-ai-node": "^1.4.3",
     "@xenova/transformers": "^2.8.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
