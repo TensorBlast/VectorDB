@@ -38,7 +38,7 @@ if (args.length >= 1) {
         }
     }
 }
-else if (process.env.DOTENV !== null) {
+else if (process.env.DOTENV !== undefined) {
     console.log("VectorDB using dotenv from Environment Variable DOTENV: " + process.env.DOTENV);
     dotenv.config({path: process.env.DOTENV});
 }
@@ -48,12 +48,13 @@ else {
 }
 
 import * as ItemService from './itemService';
+import { escape } from "lodash";
 
 type Item = IndexItem;
 
 env.localModelPath = process.env.MODELPATH || "";
 
-let __dirname = path.resolve(process.env.INDEX_LOCATION || "");
+let dirname = path.resolve(process.env.INDEX_LOCATION || "");
 
 let phrases: string[] = ['That is a very happy person', 
                       'That is a Happy Dog',
@@ -61,7 +62,7 @@ let phrases: string[] = ['That is a very happy person',
 
 const searchstr: string = "That is a happy person!"
 
-let modelname = process.env.MODELNAME ?? "Xenova/bge-large-en-v1.5";
+let modelname = process.env.MODELNAME || "Xenova/bge-large-en-v1.5";
 
 if (env.localModelPath !== "") {
     console.log("APP: Local model path: " + env.localModelPath);
@@ -75,12 +76,12 @@ let index: LocalIndex;
 
 if (!process.env.INDEX_LOCATION) {
     console.log("APP: INDEX_LOCATION not set! Using default -> " + __dirname);
-    index = new LocalIndex(path.join(__dirname,"..", "index"));
-    console.log(`Index location: ${path.join(__dirname,"..", "index")}`);
+    index = new LocalIndex(path.join(dirname,"..", "index"));
+    console.log(`Index location: ${path.join(dirname,"..", "index")}`);
 }
 else {
-    index = new LocalIndex(path.join(__dirname, "index"));
-    console.log(`APP: Index location: ${path.join(__dirname, "index")}`);
+    index = new LocalIndex(path.join(dirname, "index"));
+    console.log(`APP: Index location: ${path.join(dirname, "index")}`);
 }
 
 if (!await index.isIndexCreated()) {

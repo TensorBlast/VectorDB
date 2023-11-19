@@ -11,15 +11,15 @@ export const itemRouter = express.Router();
 export const queryRouter = express.Router();
 
 dotenv.config();
-let index;
+let index: LocalIndex;
 
-const __dirname = path.resolve(process.env.INDEX_LOCATION || "");
+const dirname = path.resolve(process.env.INDEX_LOCATION || "");
 if (!process.env.INDEX_LOCATION) {
     console.log("INDEX_LOCATION not set! Using default -> " + __dirname);
-    index = new LocalIndex(path.join(__dirname,"..", "index"));
+    index = new LocalIndex(path.join(dirname,"..", "index"));
 }
 else {
-    index = new LocalIndex(path.join(__dirname, "index"));
+    index = new LocalIndex(path.join(dirname, "index"));
 }
 
 itemRouter.get("/", async (req: Request, res: Response) => {

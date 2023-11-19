@@ -4,7 +4,7 @@ import { IndexItem } from "vectra";
 import { createHash } from "crypto";
 import * as dotenv from "dotenv";
 
-if (process.env.DOTENV !== null) {
+if (process.env.DOTENV !== undefined) {
     console.log('ItemService using dotenv: ' + process.env.DOTENV);
     dotenv.config({path: process.env.DOTENV});
 }
@@ -13,7 +13,7 @@ else {
     dotenv.config();
 }
 
-let modelname = process.env.MODELNAME ?? "Xenova/bge-large-en-v1.5";
+let modelname = process.env.MODELNAME || "Xenova/bge-large-en-v1.5";
 env.localModelPath = process.env.MODELPATH || "";
 
 if (env.localModelPath !== "") {
