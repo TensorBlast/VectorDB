@@ -1,26 +1,31 @@
-import * as ItemService from './itemService'
-
 import { LocalIndex, IndexItem } from "vectra";
 import path from "path";
 import express, { Request, Response } from "express";
 import * as lodash from "lodash";
-import * as dotenv from "dotenv";
+import * as ItemService from './itemService';
+
+
 
 export const itemRouter = express.Router();
 
 export const queryRouter = express.Router();
 
-dotenv.config();
-let index: LocalIndex;
 
-const dirname = path.resolve(process.env.INDEX_LOCATION || "");
-if (!process.env.INDEX_LOCATION) {
-    console.log("INDEX_LOCATION not set! Using default -> " + __dirname);
-    index = new LocalIndex(path.join(dirname,"..", "index"));
+var index;
+
+export async function setIndex() {
+    const dirname = path.resolve(process.env.INDEX || "");
+    if (process.env.INDEX === undefined || process.env.INDEX === null) {
+        console.log("Router: INDEX_LOCATION not set! Using default -> " + dirname);
+        index = new LocalIndex(path.join(dirname,"..", "index"));
+    }
+    else {
+        console.log("Router: INDEX_LOCATION set to -> " + dirname)
+        index = new LocalIndex(path.join(dirname, "index"));
+    }
 }
-else {
-    index = new LocalIndex(path.join(dirname, "index"));
-}
+
+
 
 itemRouter.get("/", async (req: Request, res: Response) => {
     console.log(`LOG: Received GET request for all items - from ${req.ip}`)
